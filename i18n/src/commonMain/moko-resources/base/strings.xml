@@ -1464,6 +1464,7 @@
     <string name="pref_translation_fetch_models_summary">Fetch the provider\'s latest model list to pick from (enter the key first)</string>
     <string name="pref_translation_fetching">Fetching…</string>
     <string name="pref_translation_fetch_models_empty">Couldn\'t fetch the model list; enter a model id manually</string>
+    <string name="pref_translation_fetch_models_no_key">API key is empty. Enter the key first</string>
     <string name="pref_translation_pick_model">Select model (%d)</string>
     <string name="pref_translation_privacy">Privacy</string>
     <string name="pref_translation_privacy_summary">Only OCR\'d text leaves the device — tap for the full disclosure</string>

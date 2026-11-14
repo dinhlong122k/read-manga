@@ -1,5 +1,6 @@
 package eu.kanade.presentation.more.settings.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -71,6 +72,18 @@ private fun providerLabel(provider: LlmProvider): String = when (provider.id) {
     "sakura" -> stringResource(MR.strings.pref_translation_provider_sakura)
     "custom" -> stringResource(MR.strings.pref_translation_provider_custom)
     else -> provider.displayName
+}
+
+/**
+ * Lý do "Lấy danh sách model" thất bại, để hiện cho người dùng (null = không rõ lý do).
+ *  - Chưa nhập API key → [noKeyText] (LlmModels bỏ qua, không gửi request nên không có lastError).
+ *  - Có lỗi từ server/mạng → [lastError] (vd "RuntimeException: HTTP 401 ..." = key sai,
+ *    "UnknownHostException: ..." = mất mạng / sai địa chỉ).
+ */
+internal fun fetchModelsFailureReason(apiKey: String, lastError: String?, noKeyText: String): String? = when {
+    apiKey.isBlank() -> noKeyText
+    !lastError.isNullOrBlank() -> lastError
+    else -> null
 }
 
 /** 「改設定後更新已翻章」對話框種類：UPGRADE＝改去字方法(升級重繪)、LAYOUT＝改排版(各章用原去字法重繪、只套新排版)。 */
@@ -571,15 +584,25 @@ object SettingsTranslationScreen : SearchableSettings {
                                 scope.launch {
                                     fetchingModels = true
                                     val url = LlmProviders.modelsUrlOf(providerPreset, prefs.apiBase.get())
-                                    val list = LlmModels.list(
-                                        url,
-                                        providerPreset.modelSource,
-                                        prefs.apiKeyFor(providerId).get(),
-                                    )
+                                    val apiKey = prefs.apiKeyFor(providerId).get()
+                                    val list = LlmModels.list(url, providerPreset.modelSource, apiKey)
                                     fetchingModels = false
                                     if (list.isEmpty()) {
+                                        // Hiện lý do thật thay vì chỉ báo "rỗng": chưa nhập key, hoặc lỗi
+                                        // từ server/mạng (vd "HTTP 401 ..." = key sai) do LlmModels ghi lại.
+                                        val reason = fetchModelsFailureReason(
+                                            apiKey = apiKey,
+                                            lastError = LlmModels.lastError,
+                                            noKeyText = context.ctxStringResource(
+                                                MR.strings.pref_translation_fetch_models_no_key,
+                                            ),
+                                        )
+                                        val base = context.ctxStringResource(
+                                            MR.strings.pref_translation_fetch_models_empty,
+                                        )
                                         context.toast(
-                                            context.ctxStringResource(MR.strings.pref_translation_fetch_models_empty),
+                                            if (reason == null) base else "$base\n$reason",
+                                            Toast.LENGTH_LONG,
                                         )
                                     } else {
                                         modelPicker = list.map { it.id }

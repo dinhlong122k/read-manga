@@ -920,4 +920,6 @@
     <string name="pref_filter_update_categories_details">Các cập nhật trong các danh mục bị loại trừ sẽ không được hiển thị ngay cả khi chúng cũng nằm trong bất kỳ danh mục nào được bao gồm.</string>
     <string name="pref_filter_upcoming_categories_details">Các tựa sách thuộc các danh mục bị loại trừ sẽ không được hiển thị, ngay cả khi chúng cũng nằm trong bất kỳ danh mục nào được bao gồm.</string>
     <string name="pref_translation_lang_vietnamese">Tiếng Việt</string>
+    <string name="pref_translation_fetch_models_empty">Không lấy được danh sách model, hãy nhập model id thủ công</string>
+    <string name="pref_translation_fetch_models_no_key">Chưa nhập API key, hãy nhập key trước</string>
 </resources>
