@@ -109,13 +109,35 @@ object EngineConfigMapping {
         maskDilate = prefs.maskDilate.get().coerceIn(8, 40).toFloat(),
     )
 
+    /**
+     * Các ngôn ngữ đích có thể viết chữ dọc (CJK). Giá trị phải khớp đúng key trong danh sách ngôn ngữ đích
+     * ở màn hình cài đặt dịch (SettingsTranslationScreen).
+     */
+    private val VERTICAL_CAPABLE_TARGETS = setOf(
+        TranslationPreferences.DEFAULT_TARGET_LANG, // tiếng Trung phồn thể (mặc định)
+        "Japanese",
+        "Simplified Chinese",
+        "Korean",
+    )
+
+    /**
+     * Chọn hướng chữ khi vẽ bản dịch.
+     *
+     * - Người dùng chọn rõ "vertical" hoặc "horizontal" thì làm đúng như vậy.
+     * - Chế độ "auto" (bám theo hướng chữ gốc): nếu ngôn ngữ đích là CJK thì giữ AUTO như cũ.
+     *   Nếu đích là chữ Latin/Cyrillic (tiếng Việt, tiếng Anh, ...) thì ép ngang, vì engine xếp dọc
+     *   từng chữ cái một, rất khó đọc khi bóng thoại gốc tiếng Nhật xếp dọc.
+     */
+    fun resolveOrientation(orientationRaw: String, targetLang: String): TextOrientation = when (orientationRaw) {
+        "vertical" -> TextOrientation.VERTICAL
+        "horizontal" -> TextOrientation.HORIZONTAL
+        else -> if (targetLang in VERTICAL_CAPABLE_TARGETS) TextOrientation.AUTO else TextOrientation.HORIZONTAL
+    }
+
     /** 排版設定（翻譯與重繪共用）。 */
     fun renderConfig(prefs: TranslationPreferences): RenderConfig = RenderConfig(
-        orientation = when (prefs.orientation.get()) {
-            "vertical" -> TextOrientation.VERTICAL
-            "horizontal" -> TextOrientation.HORIZONTAL
-            else -> TextOrientation.AUTO
-        },
+        // Hướng chữ phụ thuộc cả ngôn ngữ đích (targetLangName đã có trong signatureFields → đổi ngôn ngữ thì engine tự build lại).
+        orientation = resolveOrientation(prefs.orientation.get(), prefs.targetLangName.get()),
         fontBorder = prefs.fontBorder.get(),
         colorMode = if (prefs.colorMode.get() == "mono") "mono" else "auto",
         artStrokeRatio = parseFloat(prefs.artStrokeRatio.get(), 0f, 0.5f, 0.16f),

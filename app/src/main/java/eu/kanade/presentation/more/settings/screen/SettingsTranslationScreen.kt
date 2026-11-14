@@ -334,6 +334,8 @@ object SettingsTranslationScreen : SearchableSettings {
             "German" to stringResource(MR.strings.pref_translation_lang_german),
             "Portuguese" to stringResource(MR.strings.pref_translation_lang_portuguese),
             "Russian" to stringResource(MR.strings.pref_translation_lang_russian),
+            // Tiếng Việt: chỉ làm ngôn ngữ đích (model OCR không đọc được chữ Việt nên không thêm vào sourceLangs).
+            "Vietnamese" to stringResource(MR.strings.pref_translation_lang_vietnamese),
         )
         val sourceLangs = persistentMapOf(
             "" to stringResource(MR.strings.pref_translation_lang_auto_detect),

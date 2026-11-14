@@ -1545,6 +1545,7 @@
     <string name="pref_translation_lang_simp_chinese">簡體中文</string>
     <string name="pref_translation_lang_spanish">西班牙文</string>
     <string name="pref_translation_lang_trad_chinese">繁體中文（台灣）</string>
+    <string name="pref_translation_lang_vietnamese">越南文</string>
     <string name="supportUsScreen.contactPlatform">Discord</string>
     <string name="donationCampaign.contactPlatform">Discord</string>
     <string name="supportUsScreen.perks">贊助者可使用專屬頻道，未來也會提供更多福利。</string>
