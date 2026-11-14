@@ -1104,6 +1104,7 @@
     <string name="pref_translation_fetch_models_summary">從供應商撈最新清單供選（需先填 key）</string>
     <string name="pref_translation_fetching">抓取中…</string>
     <string name="pref_translation_fetch_models_empty">撈不到模型清單，請手動輸入 model id</string>
+    <string name="pref_translation_fetch_models_no_key">尚未填 API key，請先填入</string>
     <string name="pref_translation_pick_model">選擇模型（%d）</string>
     <string name="pref_translation_privacy">隱私</string>
     <string name="pref_translation_privacy_summary">只有 OCR 後的文字會離開裝置——點選看完整說明</string>
