@@ -131,6 +131,42 @@ class EngineConfigMappingTest {
         ren { fontSizeMin.set("100") }.fontSizeMin shouldBe 40
     }
 
+    /** Chế độ auto: đích CJK giữ AUTO (bám hướng chữ gốc); đích Latin như tiếng Việt thì ép ngang. */
+    @Test
+    fun `auto ép chữ ngang khi ngôn ngữ đích không phải CJK`() {
+        fun ren(setup: TranslationPreferences.() -> Unit) = EngineConfigMapping.renderConfig(prefs(setup))
+
+        // Đích CJK + auto → giữ nguyên AUTO như trước.
+        ren {}.orientation shouldBe TextOrientation.AUTO
+        for (cjk in listOf("Japanese", "Simplified Chinese", "Korean")) {
+            ren { targetLangName.set(cjk) }.orientation shouldBe TextOrientation.AUTO
+        }
+        // Đích Latin + auto → ngang.
+        for (latin in listOf("Vietnamese", "English", "French")) {
+            ren { targetLangName.set(latin) }.orientation shouldBe TextOrientation.HORIZONTAL
+        }
+        // Người dùng chọn rõ thì tôn trọng lựa chọn, kể cả với tiếng Việt.
+        ren {
+            targetLangName.set("Vietnamese")
+            orientation.set("vertical")
+        }.orientation shouldBe TextOrientation.VERTICAL
+        ren {
+            targetLangName.set("Japanese")
+            orientation.set("horizontal")
+        }.orientation shouldBe TextOrientation.HORIZONTAL
+    }
+
+    /** Tiếng Việt: prompt nhận đúng tên ngôn ngữ, bỏ few-shot Nhật→Trung, và bản vẽ lại dùng cùng config với bản dịch. */
+    @Test
+    fun `chọn tiếng Việt truyền vào prompt và bỏ few-shot tiếng Trung`() {
+        val p = prefs { targetLangName.set("Vietnamese") }
+        val engine = EngineConfigMapping.buildEngineConfig(p, "auto_whole")
+        engine.translator.toLangName shouldBe "Vietnamese"
+        engine.translator.sampleSource shouldBe ""
+        engine.translator.sampleTarget shouldBe ""
+        EngineConfigMapping.renderConfig(p) shouldBe engine.render
+    }
+
     /**
      * 把 [TranslationPreferences] 每個 pref 改成幾個候選值，各在兩種起點（預設；自訂供應商＋自填端點，讓 apiBase 也會影響設定）
      * 上比：只要 [EngineConfigMapping.buildEngineConfig] 因此變了，[EngineConfigMapping.signatureFields] 就一定要跟著變
