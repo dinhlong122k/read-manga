@@ -10,6 +10,15 @@ plugins {
 android {
     namespace = "eu.davidea.flexibleadapter"
 
+    // SelectableAdapter có in BuildConfig.VERSION_NAME. AGP 8 mặc định tắt BuildConfig và không còn
+    // VERSION_NAME cho module thư viện → bật lại và tự khai báo (5.1.0 = phiên bản của bản fork arkon).
+    buildFeatures {
+        buildConfig = true
+    }
+    defaultConfig {
+        buildConfigField("String", "VERSION_NAME", "\"5.1.0\"")
+    }
+
     // Thư viện Java cũ: bỏ qua lint để không chặn build vì cảnh báo của code bên thứ ba.
     lint {
         abortOnError = false
